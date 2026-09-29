@@ -1,7 +1,7 @@
-import { headers } from "./config.js";
-import { calculate } from "./calc.js";
-import { renderTable, renderRow } from "./view.js";
-import { renderResult } from "./ui.js";
+import { headers } from "./js/config.js";
+import { calculate } from "./js/calc.js";
+import { renderTable, renderRow } from "./js/view.js";
+import { renderResult } from "./js/ui.js";
 
 // キャラデータ定義
 let characters = [];
@@ -30,7 +30,7 @@ async function init() {
 	initCharacterSelect();
 
 	// 遺物読み込み
-	const res = await fetch("../data/ibutsu.json");
+	const res = await fetch("./data/ibutsu.json");
 	const dataIbutsu = await res.json();
 
 	// 行描画
@@ -49,7 +49,7 @@ async function init() {
 // キャラデータ読み込み
 // =====================
 async function loadCharacters() {
-	const res = await fetch("../data/characters.json");
+	const res = await fetch("./data/characters.json");
 	characters = await res.json();
 }
 
