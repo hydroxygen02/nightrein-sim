@@ -1,7 +1,7 @@
 import { headers } from "./js/config.js";
 import { calculate } from "./js/calc.js";
-import { renderTable, renderRow } from "./js/view.js";
-import { renderResult } from "./js/ui.js";
+import { renderTable, renderRow } from "./ui/view.js";
+import { renderResult } from "./ui/result.js";
 
 // キャラデータ定義
 let characters = [];

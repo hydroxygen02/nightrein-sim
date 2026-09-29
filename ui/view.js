@@ -1,4 +1,4 @@
-import { IBUTSU_CNT_MAX } from "./config.js";
+import { IBUTSU_CNT_MAX } from "../js/config.js";
 
 // ヘッダー生成
 export function renderTable(table, headers) {
