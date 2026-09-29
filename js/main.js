@@ -18,8 +18,44 @@ characters.forEach((c, i) => {
 	charSelect.appendChild(option);
 });
 
+// event
+//画面上のどこかが変わったとき、計算処理実行
+document.addEventListener("change", handleChange);
+
 // 初期化処理
 init();
+
+// =====================
+// 初期化処理
+// =====================
+async function init() {
+
+	// テーブルヘッダ
+	renderTable(table, headers);
+
+	try {
+		// キャラ読み込み
+		await loadCharacters();
+
+		// キャラ選択
+		initCharacterSelect();
+
+		// 遺物読み込み
+		const res = await fetch("../data/ibutsu.json");
+		const dataIbutsu = await res.json();
+
+		console.log("JSON読み込み結果:", dataIbutsu);
+
+		// 行描画
+		dataIbutsu.forEach(d => renderRow(table, d));
+
+		// 初期画面用計算処理
+		handleChange();
+
+	} catch (err) {
+		console.error("エラー", err);
+	}
+}
 
 // =====================
 // キャラデータ読み込み
@@ -27,8 +63,6 @@ init();
 async function loadCharacters() {
 	const res = await fetch("../data/characters.json");
 	characters = await res.json();
-
-	initCharacterSelect();
 }
 
 // =====================
@@ -45,54 +79,24 @@ function initCharacterSelect() {
 		option.textContent = `${c.name} (HP:${c.hp})`;
 		charSelect.appendChild(option);
 	});
+
+	charSelect.value = "0";
 }
-
-// =====================
-// 初期化処理
-// =====================
-async function init() {
-
-	// テーブルヘッダ
-	renderTable(table, headers);
-
-	try {
-		// キャラ読み込み
-		await loadCharacters();
-
-		// 遺物読み込み
-		const res = await fetch("../data/ibutsu.json");
-		const dataIbutsu = await res.json();
-
-		console.log("JSON読み込み結果:", dataIbutsu);
-
-		// 行描画
-		dataIbutsu.forEach(d => renderRow(table, d));
-
-		// 初回計算
-		handleChange();
-
-	} catch (err) {
-		console.error("エラー", err);
-	}
-}
-
-// =====================
-// event
-// =====================
-//画面上のどこかが変わったとき、計算処理実行
-document.addEventListener("change", handleChange);
-
-//初期画面用計算処理
-handleChange();
 
 // =====================
 // 計算処理
 // =====================
 function handleChange() {
 
+	if (!characters.length) return;
+
 	const inputs = document.querySelectorAll("input:checked");
 
-	const baseHp = characters[charSelect.value].hp;
+	const selectedIndex = Number(charSelect.value);
+
+	if (!characters[selectedIndex]) return;
+
+	const baseHp = characters[selectedIndex].hp;
 
 	const result = calculate(inputs, baseHp);
 
