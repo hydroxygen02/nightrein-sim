@@ -5,22 +5,8 @@ import { renderResult } from "./ui.js";
 
 // キャラデータ定義
 let characters = [];
-
-// DOM取得
-const charSelect = document.getElementById("character");
-const table = document.getElementById("table");
-
-// キャラ選択 初期化
-characters.forEach((c, i) => {
-	const option = document.createElement("option");
-	option.value = i;
-	option.textContent = `${c.name} (HP:${c.hp})`;
-	charSelect.appendChild(option);
-});
-
-// event
-//画面上のどこかが変わったとき、計算処理実行
-document.addEventListener("change", handleChange);
+let charSelect;
+let table;
 
 // 初期化処理
 init();
@@ -30,31 +16,33 @@ init();
 // =====================
 async function init() {
 
+	// DOM取得
+	charSelect = document.getElementById("character");
+	table = document.getElementById("table");
+
 	// テーブルヘッダ
 	renderTable(table, headers);
 
-	try {
-		// キャラ読み込み
-		await loadCharacters();
+	// キャラ読み込み
+	await loadCharacters();
 
-		// キャラ選択
-		initCharacterSelect();
+	// キャラ選択
+	initCharacterSelect();
 
-		// 遺物読み込み
-		const res = await fetch("../data/ibutsu.json");
-		const dataIbutsu = await res.json();
+	// 遺物読み込み
+	const res = await fetch("../data/ibutsu.json");
+	const dataIbutsu = await res.json();
 
-		console.log("JSON読み込み結果:", dataIbutsu);
+	// 行描画
+	dataIbutsu.forEach(d => renderRow(table, d));
 
-		// 行描画
-		dataIbutsu.forEach(d => renderRow(table, d));
+	// event
+	// 初期画面用計算処理
+	handleChange();
 
-		// 初期画面用計算処理
-		handleChange();
+	//画面上のどこかが変わったとき、計算処理実行
+	document.addEventListener("change", handleChange);
 
-	} catch (err) {
-		console.error("エラー", err);
-	}
 }
 
 // =====================
