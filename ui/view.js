@@ -1,4 +1,4 @@
-import { IBUTSU_CNT_MAX } from "../js/config.js";
+import { UNIQUE_MARK, IBUTSU_CNT_MAX } from "../js/config.js";
 
 // =====================
 // テーブルヘッダ
@@ -15,10 +15,16 @@ export function renderTable(table, headers) {
 // =====================
 export function renderRow(table, dataIbutsu) {
 
-		let tr = `<tr><td>${dataIbutsu.name}</td>`;
-		// 重複・備考（今は空）
-		tr += `<td></td>`;
-		tr += `<td></td>`;
+	// 効果
+	let tr = `<tr><td>${dataIbutsu.name}</td>`;
+	
+	// 重ね掛け
+	const frontMark = UNIQUE_MARK[dataIbutsu.front?.unique] ?? "";
+	const backMark  = UNIQUE_MARK[dataIbutsu.back?.unique] ?? "";
+	tr += `<td>${frontMark} / ${backMark}</td>`;
+
+	// 備考
+	tr += `<td></td>`;
 
 	// =====================
 	// 遺物列
@@ -31,6 +37,8 @@ export function renderRow(table, dataIbutsu) {
 
 		const unique = side.unique;
 		const calcType = side.calc;
+		const count = side.count;
+
 		const list = side.values;
 
 		// o = 1つの選択肢（{label, value}）
@@ -45,6 +53,7 @@ export function renderRow(table, dataIbutsu) {
 					data-key="${dataIbutsu.id}"
 					data-unique="${unique}"
 					data-calc="${calcType}"
+					data-count="${values.count ?? 1}"
 					value="${values.value}"
 					${getInputType(dataIbutsu.group) === "radio" && i === 0 ? "checked" : ""}
 				>

@@ -185,6 +185,7 @@
 			]
 		},
 		"back": {
+			"unique": "none",
 			"values": [
 				{ "label":"なし", "value":1.00 }
 			]
@@ -212,6 +213,7 @@
 		},
 
 		"back": {
+			"unique": "none",
 			"values": [
 				{ "label":"なし", "value":1.00 }
 			]

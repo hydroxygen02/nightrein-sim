@@ -27,7 +27,8 @@ export function calculate(inputs, baseHp) {
 		const group = i.dataset.group;
 		const type = i.dataset.type;
 		const key = i.dataset.key;
-		const calcType = i.dataset.calc; // "mul" or "add"
+		const calcType = i.dataset.calc;
+		const count = Number(i.dataset.count ?? 1);
 
 		// ================= 重複制御 =================
 
@@ -58,7 +59,7 @@ export function calculate(inputs, baseHp) {
 			}
 
 			if (calcType === "mul") {
-				atk[type] *= value;
+				atk[type] *= value ** count;
 			}
 
 			return;
