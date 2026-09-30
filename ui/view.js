@@ -1,6 +1,8 @@
 import { IBUTSU_CNT_MAX } from "../js/config.js";
 
-// ヘッダー生成
+// =====================
+// テーブルヘッダ
+// =====================
 export function renderTable(table, headers) {
 	table.innerHTML =
 		"<tr>" +
@@ -8,67 +10,57 @@ export function renderTable(table, headers) {
 		"</tr>";
 }
 
-// カラム設定
-export function renderRow(table, ibutsuData) {
+// =====================
+// 1行描画
+// =====================
+export function renderRow(table, dataIbutsu) {
 
-    // "効果"カラム
-	let tr = `<tr><td>${ibutsuData.name}</td>`;
-    // "重複"カラム
-	tr += `<td></td>`;
-    // "備考"カラム
-	tr += `<td></td>`;
+		let tr = `<tr><td>${dataIbutsu.name}</td>`;
+		// 重複・備考（今は空）
+		tr += `<td></td>`;
+		tr += `<td></td>`;
 
-    // "遺物"カラム
+	// =====================
+	// 遺物列
+	// =====================
 	for (let col = 0; col < IBUTSU_CNT_MAX; col++) {
 
-		if (ibutsuData.group === "atk") {
-			const list = (col < 3) ? ibutsuData.front : ibutsuData.back;
+		// 表遺物か判定
+		const isFront = col < 3;
+		const side = isFront ? dataIbutsu.front : dataIbutsu.back;
 
-			tr += `<td>` +
-				list.map((o,i)=>`
-					<label>
-						<input type="radio"
-							name="${ibutsuData.name}__${col}"
-							data-group="atk"
-							data-type="${ibutsuData.type}"
-							data-key="${ibutsuData.name}"
-							data-unique="${o.unique ?? false}"
-							value="${o.value}"
-							${i===0?"checked":""}>
-						${o.label}
-					</label><br>
-				`).join("") +
-			`</td>`;
-		}
+		const unique = side.unique;
+		const calcType = side.calc;
+		const list = side.values;
 
-		else if (ibutsuData.group === "hp") {
-			const list = (col < 3) ? ibutsuData.front : ibutsuData.back;
-
-			tr += `<td>` +
-				list.map((o)=>`
-					<label>
-						<input type="radio"
-							name="${ibutsuData.name}_${col}"
-							data-group="hp"
-							data-kind="${o.kind}"
-							data-key="${ibutsuData.name}"
-							data-unique="${o.unique ?? false}"
-							value="${o.value}">
-						${o.label}
-					</label><br>
-				`).join("") +
-			`</td>`;
-		}
-
-		else if (ibutsuData.group === "cut") {
-			tr += `<td>
-				<input type="checkbox"
-					data-group="cut"
-					value="${ibutsuData.value}">
-			</td>`;
-		}
+		// o = 1つの選択肢（{label, value}）
+		// i = 何番目か（0,1,2...）
+		// をラベル化する
+		tr += `<td>` + list.map((values, i) => `
+			<label>
+				<input type="${getInputType(dataIbutsu.group)}"
+					name="${dataIbutsu.id}_${col}"
+					data-group="${dataIbutsu.group}"
+					data-type="${dataIbutsu.type}"
+					data-key="${dataIbutsu.id}"
+					data-unique="${unique}"
+					data-calc="${calcType}"
+					value="${values.value}"
+					${getInputType(dataIbutsu.group) === "radio" && i === 0 ? "checked" : ""}
+				>
+				${values.label}
+			</label><br>
+		`).join("") + `</td>`;
 	}
 
 	tr += `</tr>`;
 	table.innerHTML += tr;
+}
+
+// =====================
+// 入力タイプ切替
+// =====================
+function getInputType(group) {
+	if (group === "cut") return "checkbox";
+	return "radio";
 }

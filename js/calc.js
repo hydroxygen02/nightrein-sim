@@ -1,89 +1,109 @@
-// calc.js
-
 export function calculate(inputs, baseHp) {
 
-	let atkAll = 1;
-	let atkButsuri = 1;
-	let atkMaryoku = 1;
-	let atkFire = 1;
-	let atkKaminari = 1;
-	let atkSei = 1;
-	let atkZokusei = 1;
+	let atk = {
+		all: 1,
+		butsuri: 1,
+		maryoku: 1,
+		fire: 1,
+		kaminari: 1,
+		sei: 1,
+		zokusei: 1
+	};
+
 	let hpAdd = 0;
-	let hpRate = 0;
+	let hpRate = 1;
 	let cut = 0;
 
-	const usedUnique = new Set();
+	// 重複管理
+	const usedUnique = new Set();     // 重複なし用
+	const usedValue = new Map();      // 違う値のみ重複あり用
 
+	// i = チェックした内容
 	inputs.forEach(i => {
 
+		// dataset = views.jsのdata-xxxの部分
+		const unique = i.dataset.unique;
+		const value = Number(i.value);
 		const group = i.dataset.group;
 		const type = i.dataset.type;
-		const value = Number(i.value);
+		const key = i.dataset.key;
+		const calcType = i.dataset.calc; // "mul" or "add"
 
-		// ===== atk =====
+		// ================= 重複制御 =================
+
+		// 重複なし
+		if (unique === "single") {
+			// なしの選択肢は無視
+			if (value === 1.0) return;
+			if (usedUnique.has(key)) return;
+			usedUnique.add(key);
+		}
+
+		// 違うプラス値だけ計算対象 → 同じkey内で「同じvalue」は除外
+		if (unique === "unique") {
+			if (!usedValue.has(key)) {
+				usedValue.set(key, new Set());
+			}
+			const set = usedValue.get(key);
+
+			if (set.has(value)) return;
+			set.add(value);
+		}
+
+		// ================= atk =================
 		if (group === "atk") {
 
-			const unique = i.dataset.unique === "true";
-
-			if (unique) {
-				const key = "atk_" + i.dataset.key;
-				if (usedUnique.has(key)) return;
-				usedUnique.add(key);
+			if (calcType === "add") {
+				atk[type] += value;
 			}
 
-			if (type === "butsuri") atkButsuri *= value;
-			else if (type === "maryoku") atkMaryoku *= value;
-			else if (type === "fire") atkFire *= value;
-			else if (type === "kaminari") atkKaminari *= value;
-			else if (type === "sei") atkSei *= value;
-			else if (type === "zokusei") atkZokusei *= value;
-			else if (type === "all") atkAll *= value;
+			if (calcType === "mul") {
+				atk[type] *= value;
+			}
 
 			return;
 		}
 
-		// ===== hp =====
+		// ================= hp =================
 		if (group === "hp") {
 
-			const kind = i.dataset.kind;
-			const unique = i.dataset.unique === "true";
-
-			if (unique) {
-				const key = "hp_" + i.dataset.key;
-				if (usedUnique.has(key)) return;
-				usedUnique.add(key);
+			if (calcType === "add") {
+				hpAdd += value;
 			}
 
-			if (kind === "add") hpAdd += value;
-			if (kind === "rate") hpRate += (value - 1);
+			if (calcType === "mul") {
+				hpRate *= value;
+			}
 
 			return;
 		}
 
-		// ===== cut =====
+		// ================= cut =================
 		if (group === "cut") {
 			cut += (value - 1);
 		}
 	});
 
-	// ===== 最終計算 =====
-	const finalHp = (baseHp + hpAdd) * (1 + hpRate);
+	// ===================== 最終計算 =====================
 
-	atkButsuri *= atkAll;
-	atkMaryoku *= atkZokusei * atkAll;
-	atkFire *= atkZokusei * atkAll;
-	atkKaminari *= atkZokusei * atkAll;
-	atkSei *= atkZokusei * atkAll;
-	atkZokusei *= atkAll;
+	// HP
+	const finalHp = (baseHp + hpAdd) * hpRate;
+
+	// 攻撃
+	atk.butsuri *= atk.all;
+	atk.maryoku *= atk.zokusei * atk.all;
+	atk.fire *= atk.zokusei * atk.all;
+	atk.kaminari *= atk.zokusei * atk.all;
+	atk.sei *= atk.zokusei * atk.all;
+	atk.zokusei *= atk.all;
 
 	return {
-		atkButsuri,
-		atkMaryoku,
-		atkFire,
-		atkKaminari,
-		atkSei,
-		atkZokusei,
+		atkButsuri: atk.butsuri,
+		atkMaryoku: atk.maryoku,
+		atkFire: atk.fire,
+		atkKaminari: atk.kaminari,
+		atkSei: atk.sei,
+		atkZokusei: atk.zokusei,
 		finalHp,
 		cut
 	};

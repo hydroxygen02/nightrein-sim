@@ -3,11 +3,10 @@ import { calculate } from "./js/calc.js";
 import { renderTable, renderRow } from "./ui/view.js";
 import { renderResult } from "./ui/result.js";
 
-// キャラデータ定義
-let dataCharacters = [];
-let dataIbutsu = [];
-let charSelect;
-let table;
+let dataCharacters = [];	// キャラのjsonデータ
+let dataIbutsu = [];		// 遺物のjsonデータ
+let selectChar;				// キャラ選択
+let selectTable;			// 遺物効果テーブル
 
 // 初期処理
 init();
@@ -17,12 +16,12 @@ init();
 // =====================
 async function init() {
 
-	// DOM取得
-	charSelect = document.getElementById("character");
-	table = document.getElementById("table");
+	// DOM取得（HTML読み込み）
+	selectChar = document.getElementById("character");
+	selectTable = document.getElementById("table");
 
 	// テーブルヘッダ
-	renderTable(table, HEADERS);
+	renderTable(selectTable, HEADERS);
 
 	// キャラデータ読み込み
 	await loadCharacters();
@@ -59,10 +58,10 @@ function initCharacterSelect() {
 
 	charSelect.innerHTML = "";
 
-	dataCharacters.forEach((c, i) => {
+	dataCharacters.forEach((chara, i) => {
 		const option = document.createElement("option");
 		option.value = i;
-		option.textContent = `${c.name} (HP:${c.hp})`;
+		option.textContent = `${chara.name} (HP:${chara.hp})`;
 		charSelect.appendChild(option);
 	});
 
@@ -82,7 +81,7 @@ async function loadIbutsu() {
 // =====================
 function initIbutsuView() {
 	// 行描画
-	dataIbutsu.forEach(d => renderRow(table, d));
+	dataIbutsu.forEach(d => renderRow(selectTable, d));
 }
 
 // =====================
@@ -109,7 +108,7 @@ function getState() {
 	if (!dataCharacters.length) return null;
 
 	// セレクトボックスで選ばれているキャラのインデックスを取得
-	const selectedIndex = Number(charSelect.value);
+	const selectedIndex = Number(selectChar.value);
 
 	// インデックスが不正（未選択 or 範囲外）の場合は処理しない
 	const character = dataCharacters[selectedIndex];
