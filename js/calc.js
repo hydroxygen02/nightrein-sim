@@ -10,8 +10,8 @@ export function calculate(inputs, baseHp) {
 		zokusei: 1
 	};
 
-	let hpAdd = 0;
 	let hpRate = 1;
+	let hpAdd = 0;
 	let cut = 0;
 
 	// 重複管理
